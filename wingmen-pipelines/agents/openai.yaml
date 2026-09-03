@@ -1,0 +1,4 @@
+interface:
+  display_name: "Autopilot Pipelines"
+  short_description: "Build and supervise Autopilot pipelines."
+  default_prompt: "Use this skill to create, run, inspect, edit, or debug an Autopilot pipeline and its supervised agent work."
