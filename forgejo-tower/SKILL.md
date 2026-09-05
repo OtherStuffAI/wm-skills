@@ -21,6 +21,7 @@ Do not create a Forgejo fork, mutate its database, hand out the reconciliation t
 - One Tower workspace maps to one Forgejo organization; repositories belong to that organization.
 - Workspace/repository UUIDs remain stable. The organization namespace and actor usernames are readable aliases.
 - Claim the organization namespace before creating the first repository. It becomes locked after repository creation.
+- Bootstrap headless actors through the Autopilot `forgejo bootstrap` CLI; see the organizations/users reference. Readiness and repository grants are separate.
 - Change actor usernames through Tower. The identity reconciler uses Forgejo's supported rename API.
 - Share repositories with Tower actor or stable-group UUID grants, then reconcile. Do not grant access only in Forgejo.
 - Tower workspace owners/admins map to Forgejo's stock Owners team. Other authorized actors are organization members without blanket repository access; exact repository access comes from Tower grants.
@@ -34,6 +35,7 @@ Do not create a Forgejo fork, mutate its database, hand out the reconciliation t
 | Human browser login | Gateway Nostr challenge and short Tower session |
 | Git clone/fetch/push | Stock Git plus Tower capability credential helper |
 | Organization/repository provisioning | Tower NIP-98 API plus on-demand reconciler |
+| Headless account bootstrap | Broker-signed Autopilot CLI → Tower → isolated identity worker |
 | User aliases | Tower actor-username API plus isolated identity reconciler |
 | Sharing | Tower actor/group grants plus reconciliation |
 | Issue list/read/create/comment | Tower NIP-98 issue API and isolated private broker |

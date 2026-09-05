@@ -50,7 +50,7 @@ curl -fsS http://127.0.0.1:${GIT_GATEWAY_HOST_PORT:-3180}/ready
 ```
 
 The expected services include Tower, Postgres, MinIO, Forgejo, the Git gateway,
-and the isolated Git issue broker. Forgejo port 3000 and broker port 3190 must
+the isolated Git issue broker, identity reconciler, and organization/repository reconciler. Forgejo port 3000 and broker port 3190 must
 remain unpublished. Route the public Forgejo hostname to the gateway, not
 directly to either private service.
 
@@ -61,12 +61,30 @@ After Forgejo is healthy:
 ```bash
 ./scripts/bootstrap-forgejo-control.sh
 ./scripts/bootstrap-forgejo-identity.sh
+./scripts/bootstrap-forgejo-oidc.sh
 ```
 
 - `tower-reconciler` is a non-site-admin account used only for Tower-managed organizations and repositories.
-- `tower-identity-reconciler` is an isolated administrator used only for supported username renames.
+- `tower-identity-reconciler` is an isolated administrator used only by the isolated worker for supported external account creation, immutable identity linking, and username renames.
 
 Their tokens are mounted only into their dedicated reconciliation processes. Do not expose either token to Tower routes, the gateway, users, agents, or CI jobs.
+
+Configure `GIT_FORGEJO_OIDC_SOURCE_ID` in the deployment environment with the numeric ID of the **Tower** source from `forgejo admin auth list`. Never assume source ID 1. Run the identity worker from the same tested Tower image as the API. The organization worker needs its control token and webhook settings so it can retry pending repositories automatically. An API-only rollout leaves headless requests pending.
+
+For CapRover, deploy the Tower API, gateway, issue broker, identity reconciler and organization reconciler images/commands from the matching Tower release, and apply worker-specific environment/secrets. Keep the provider admin token only in the identity reconciler. The supervisor owns live restarts and deployment.
+
+## Portable skills rollout
+
+The canonical source is `OtherStuffAI/wm-skills`. Update its `forgejo-tower` directory, then sync the named skill into the runtime user's Codex/Claude skill directories on each Autopilot host using that repository's sync tool:
+
+```bash
+python3 scripts/sync-skills.py sync --skill forgejo-tower \
+  --codex-dir "$HOME/.codex/skills" --claude-dir "$HOME/.claude/skills"
+python3 scripts/sync-skills.py check --skill forgejo-tower \
+  --codex-dir "$HOME/.codex/skills" --claude-dir "$HOME/.claude/skills"
+```
+
+ An Autopilot image rebuild does not itself fetch portable skills. Use `check` afterward and open a fresh agent session. Updating only an operator's installed skill leaves remote agents stale.
 
 ## Ingress and login smoke
 

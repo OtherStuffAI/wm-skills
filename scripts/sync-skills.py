@@ -28,6 +28,7 @@ def parse_args() -> argparse.Namespace:
         description="Synchronize or compare Wingman skills at explicit Codex/Claude destinations."
     )
     parser.add_argument("action", choices=("sync", "check"))
+    parser.add_argument("--skill", action="append", default=[], help="Sync/check only this named skill; repeatable. Defaults to all.")
     parser.add_argument("--codex-dir", type=Path)
     parser.add_argument("--claude-dir", type=Path)
     args = parser.parse_args()
@@ -115,6 +116,11 @@ def main() -> int:
     args = parse_args()
     repo_root = Path(__file__).resolve().parent.parent
     skills = discover_skills(repo_root)
+    if args.skill:
+        unknown = set(args.skill) - set(skills)
+        if unknown:
+            raise RuntimeError(f"unknown skills: {', '.join(sorted(unknown))}")
+        skills = tuple(skill for skill in skills if skill in args.skill)
     if not skills:
         raise RuntimeError(f"no skills found under {repo_root}")
     targets = []

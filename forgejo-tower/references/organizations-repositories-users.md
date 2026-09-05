@@ -20,20 +20,45 @@ https://forgejo.example/wm-owner/tower
 
 The namespace becomes locked when the first repository is created. Do not rename the Forgejo organization manually; Tower currently requires an explicit future namespace migration for that operation.
 
-## Human and agent usernames
+## Headless actor bootstrap and usernames
 
-An actor's npub/UUID remains authoritative. A readable Forgejo username is a global mutable alias:
+From an active Autopilot agent session, use the shipped broker-backed CLI:
 
-```text
-GET /api/v4/git/workspaces/<workspace-id>/actor-username
-
-PUT /api/v4/git/workspaces/<workspace-id>/actor-username
-{"username":"pw21"}
+```bash
+cd "${AUTOPILOT_REPO:-$HOME/code/wm/autopilot}"
+bun clis/wingman.ts forgejo username set --username agent-name
+bun clis/wingman.ts forgejo bootstrap request
+bun clis/wingman.ts forgejo bootstrap status
+bun clis/wingman.ts forgejo repositories list
 ```
 
-The PUT returns `202`. Continue using `applied_username` until state becomes `ready`; the identity reconciler performs a stock Forgejo rename and acknowledges it. Never delete/recreate the actor merely to change the username.
+The username command is optional. The broker discovers the active Tower and workspace from the session's active subscription; no product hostname belongs in a script. If there is more than one active Tower binding, specify `--tower-url <advertised-Tower-origin>`. Optional `--workspace <uuid>` asserts the session workspace; it does not switch authority to another workspace.
 
-Use the Tower/Flight Deck profile display name for a human-readable contribution label. Keep the username short and stable enough for URLs and Git attribution.
+`bootstrap request` is idempotent and returns `202` with a `bootstrap` object. Poll `bootstrap status` until its `state` is `ready`, or diagnose `last_error_code` when `error`. `account_state` and `organization_state` explain which stage is pending. `not_requested` means no request exists yet. A pending account with `git_forgejo_oidc_source_unconfigured` needs the Tower operator to configure the isolated identity worker. Keep polling bounded; report a persistent error to the operator with its code.
+
+Tower APIs behind these commands are:
+
+```text
+GET/POST /api/v4/git/workspaces/<workspace-id>/actor-bootstrap
+GET/PUT  /api/v4/git/workspaces/<workspace-id>/actor-username
+PUT body: {"username":"agent-name"}
+```
+
+The isolated identity worker creates the external account using Tower's configured OIDC source and immutable actor UUID, links the numeric provider ID, and uses Forgejo's supported rename API for name changes. Username conflicts fail explicitly. Existing linked accounts keep their provider ID. No browser first login, human signer, raw nsec, stored user PAT, or manual provider account is needed. Do not revoke and restore grants to unblock bootstrap.
+
+Account/organization `ready` does **not** grant repository access. An empty repository list means no visible effective grants; ask the workspace repository administrator to verify the actor or stable-group grant. Workspace membership alone does not authorize clone or push. Repository reconciliation and its desired/applied policy revisions must also be ready before Git works.
+
+Use the repository's HTTPS clone URL on the Tower-advertised Forgejo gateway. `repositories list` identifies the authorized repositories and their canonical `git_path`; do not assume it returns a complete clone URL:
+
+```bash
+git-credential-wingman --version
+git clone <advertised-clone-url>
+git -C <checkout> fetch origin
+```
+
+Autopilot supplies the shipped `git-credential-wingman` in `PATH` and host-scoped Git configuration with `credential.useHttpPath=true`. Fresh sessions receive the active gateway configuration. Never substitute a shell helper that signs Tower requests directly: it bypasses the supported session broker path. Helper errors contain a safe stage, HTTP status, and Tower code. Repository resolution denials require checking workspace and grants; bootstrap/reconciliation errors require checking the corresponding Tower status and worker health.
+
+The provider authentication actor and Git commit author are separate evidence; set normal Git author config when needed.
 
 ## Create a repository
 
@@ -51,7 +76,7 @@ POST /api/v4/git/workspaces/<workspace-id>/repositories
 
 Tower creates an administrator grant for the creating actor and protected service-managed rules for `main`, `staging`, and `deployed`. The provider repository is created only after reconciliation.
 
-Reconcile by repository UUID from the Tower host:
+The isolated organization worker automatically retries pending repositories after account and grant changes. An operator can also reconcile one repository by UUID from the Tower host:
 
 ```bash
 docker compose --project-name wingman-tower --env-file .env.prod \

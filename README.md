@@ -41,3 +41,7 @@ python3 scripts/sync-skills.py check \
 ```
 
 `check` exits `0` when managed skills are exact, `1` for drift, and `2` for invalid arguments or filesystem errors.
+
+To update only the Forgejo workflow while preserving other installed skill edits,
+add `--skill forgejo-tower` to either command. The option is repeatable; unknown
+names fail before any installed directory changes.
