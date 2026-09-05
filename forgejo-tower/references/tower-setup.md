@@ -84,7 +84,7 @@ python3 scripts/sync-skills.py check --skill forgejo-tower \
   --codex-dir "$HOME/.codex/skills" --claude-dir "$HOME/.claude/skills"
 ```
 
- An Autopilot image rebuild does not itself fetch portable skills. Use `check` afterward and open a fresh agent session. Updating only an operator's installed skill leaves remote agents stale.
+Lara automatically syncs the published `OtherStuffAI/wm-skills` repository from GitHub. For Lara, push the canonical skills changes and fast-forward/push Autopilot's `deployed` branch; do not require a separate manual remote skill installation. Use the sync commands above for hosts without that automation. Open a fresh agent session after rollout.
 
 ## Ingress and login smoke
 
