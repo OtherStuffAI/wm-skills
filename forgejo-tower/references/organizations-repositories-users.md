@@ -88,6 +88,14 @@ Verify Tower's binding is `ready` with matching desired/applied policy revisions
 
 ## Share with people, agents, or groups
 
+On a gateway with the sharing bridge deployed, open the repository’s **Settings → Collaborators** page. Select **Load sharing with Nostr**, using the identity with an explicit Tower `git.repo.admin` grant. Select a ready workspace actor or a Tower group and save Read, Write, or Administrator access. The browser signs the exact change; the page reports saved/pending until the stock provider has applied it. Reload to check. Older gateway releases do not bridge Forgejo UI edits; do not treat provider-only access as a successful grant.
+
+Write includes fetch, work/feature branch pushes and branch creation. Protected branches retain their rules. Remove revokes all direct permissions for that selected principal; grants inherited from other groups remain. Change the relevant group grant to remove inherited access. Each change checks the page’s policy revision: if sharing changed concurrently, reload and submit the intended change again.
+
+The Forgejo Owners and `tower-members` teams represent organization membership, not selectable Tower repository groups. Provider-only team/repository assignments are removed during reconciliation. Choose a stable Tower group for team sharing; no workspace-wide access is implied. Existing provider-only collaborator rows are not imported: the repository administrator must submit the intended sharing through this page after rollout.
+
+The page uses `GET/POST /api/v4/git/forgejo/sharing/<organization>/<repository>` with NIP-98, immutable actor/provider IDs and stable group UUIDs. It does not use a service token to become the administrator. Agents can continue using the existing Tower grant API with their own authorized signer:
+
 Create grants using stable actor or group UUIDs:
 
 ```text
@@ -108,7 +116,7 @@ Supported permissions:
 
 Use a stable group UUID for team access; never use rotating `group_npub` as the principal. Reconcile after grant changes. Revocation increments policy revision so old short-lived capabilities fail closed.
 
-Do not manually add Forgejo collaborators or teams as the only access record. Tower reconciliation may remove or supersede them, and the gateway still checks Tower on every browser request.
+Do not bypass the gateway to add provider collaborators or teams. Git capabilities are rechecked against current Tower policy on every operation; browser repository traffic is held closed while provider reconciliation is pending.
 
 ## Configure local repositories
 

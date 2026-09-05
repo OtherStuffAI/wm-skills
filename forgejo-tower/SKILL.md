@@ -23,7 +23,7 @@ Do not create a Forgejo fork, mutate its database, hand out the reconciliation t
 - Claim the organization namespace before creating the first repository. It becomes locked after repository creation.
 - Bootstrap headless actors through the Autopilot `forgejo bootstrap` CLI; see the organizations/users reference. Readiness and repository grants are separate.
 - Change actor usernames through Tower. The identity reconciler uses Forgejo's supported rename API.
-- Share repositories with Tower actor or stable-group UUID grants, then reconcile. Do not grant access only in Forgejo.
+- Use the gateway-backed Forgejo Settings → Collaborators page to share with a Nostr repository administrator signature, or use Tower actor/stable-group grants. Reconciliation follows Tower; provider-only grants are not imported.
 - Tower workspace owners/admins map to Forgejo's stock Owners team. Other authorized actors are organization members without blanket repository access; exact repository access comes from Tower grants.
 - Git credentials are short-lived Tower capabilities obtained through a NIP-98-aware credential helper. Do not store Forgejo user tokens in repositories or agent environments.
 - The public gateway deliberately blocks Forgejo's API and credential-management surfaces. Never bypass it by publishing Forgejo port 3000.
@@ -37,7 +37,7 @@ Do not create a Forgejo fork, mutate its database, hand out the reconciliation t
 | Organization/repository provisioning | Tower NIP-98 API plus on-demand reconciler |
 | Headless account bootstrap | Broker-signed Autopilot CLI → Tower → isolated identity worker |
 | User aliases | Tower actor-username API plus isolated identity reconciler |
-| Sharing | Tower actor/group grants plus reconciliation |
+| Sharing | Forgejo collaboration URL → signed Tower actor/group sharing → stock provider reconciliation |
 | Issue list/read/create/comment | Tower NIP-98 issue API and isolated private broker |
 | Pull requests and reviews | Forgejo browser UI for authorized humans |
 | Actions/CI | Disabled and not yet safely bridged through the current gateway; requires the platform seam in the Actions reference |
