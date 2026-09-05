@@ -9,10 +9,10 @@ Use this skill to decide where work belongs before editing. Read live code and t
 
 ## Product boundaries
 
-- **Tower** is the shared authority: NIP-98 identity, workspaces, groups, typed Flight Deck PG APIs, storage, Git authority, and graph access.
+- **Tower** is the shared authority: NIP-98 identity, workspaces, groups, typed Flight Deck PG APIs, storage, allowlisted Nostr OIDC authentication, and graph access.
 - **Flight Deck** is the human coordination UI: chat, tasks, docs, approvals, scopes, people, and WApp launchers.
 - **Autopilot** runs work: sessions, Agent Direct, supervised dispatch, pipelines, triggers, apps, and WApps.
-- **Forgejo** is Tower's private Git/PR/review enforcement replica. Tower remains authoritative for repository identity and access.
+- **Forgejo** owns native accounts, organizations, teams, collaborators, repositories, permissions, OAuth credentials, Git, APIs and reviews. Tower authenticates allowlisted Nostr identities only; no Tower Git grants or reconciliation apply.
 - **WApps** own business-specific UI and app data while using Tower and Autopilot through supported APIs.
 - **Graph memory** is a Tower-controlled optional capability, not a raw database for agents.
 

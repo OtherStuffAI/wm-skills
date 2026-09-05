@@ -1,54 +1,25 @@
 ---
 name: forgejo-tower
-description: "Set up and operate Tower-backed Forgejo: install the private forge, create workspace organizations and repositories, choose human usernames, grant users or agents access, collaborate through issues and pull requests, and plan or enable Forgejo Actions/CI."
+description: "Operate stock Forgejo with Tower Nostr authentication: native accounts, organizations, teams, repositories, permissions, OAuth, Git, issues, pull requests, and CI."
 ---
 
-# Tower-backed Forgejo
+# Forgejo with Tower sign-in
 
-Use this skill for Git collaboration on a Wingman Tower. Tower is the identity, workspace, repository, grant, capability, and audit authority. Stock Forgejo is the private Git/issue/PR/review provider and enforcement replica.
+Tower authenticates explicitly allowlisted Nostr identities through OIDC. Stock Forgejo owns accounts and usernames after registration, organizations, teams, collaborators, repositories, permissions, branch protections, OAuth credentials, Git, and APIs. This supersedes old Tower grants, capability gateway, issue broker, bootstrap and reconciliation instructions.
 
-Do not create a Forgejo fork, mutate its database, hand out the reconciliation tokens, or manually use Forgejo collaborators/teams as the canonical access model.
+Use [setup](references/tower-setup.md) for configuration and migration, [accounts and repositories](references/organizations-repositories-users.md) for native access and Git, [collaboration](references/collaboration-issues.md) for issues and pull requests, and [CI](references/actions-ci.md) before enabling Actions.
 
-## Select the workflow
+## Authentication and authorization
 
-- Read [references/tower-setup.md](references/tower-setup.md) to install or repair the Tower/Forgejo stack, bootstrap provider identities, configure ingress, or validate health.
-- Read [references/organizations-repositories-users.md](references/organizations-repositories-users.md) to claim an organization namespace, select human usernames, create repositories, grant actors/groups access, reconcile Forgejo, or configure Git remotes.
-- Read [references/collaboration-issues.md](references/collaboration-issues.md) to share work, use branches/pull requests, log or read issues, or decide whether an issue belongs in Forgejo or Flight Deck.
-- Read [references/actions-ci.md](references/actions-ci.md) before enabling Actions, adding a runner, writing workflows, handling CI secrets, or diagnosing jobs.
+- A new allowlisted identity registers through stock Forgejo's external OIDC login. Preserve existing provider account IDs, Tower OIDC issuer, immutable subjects and source links. Account names and later renames are managed in Forgejo.
+- Autopilot's shipped `git-credential-wingman` and session broker perform native Forgejo authorization-code + PKCE login, completing Tower's exact Nostr challenge with the managed signer. Forgejo issues the account's OAuth token. Use the shipped helper; never replace it with a custom signer or shared human credential.
+- Credentials are protected per actor and Forgejo host. Never put tokens in Git URLs, logs, source, commands, or agent environment dumps. A management token is never an agent runtime credential.
+- Expired credentials are discarded and the same native sign-in is repeated through Tower. Do not introduce Tower Git tokens, refresh authority, or retry a permission denial indefinitely.
+- All repository discovery, Git and API traffic goes directly to stock Forgejo, including when a plain reverse proxy preserves its public URL. Native API and token routes are not blocked by Tower.
+- Use Forgejo organizations, teams and collaborators to grant/revoke permissions. There is no Tower workspace-to-organization mapping, group replication, repository grant check, permission writer or reconciliation.
+- Existing native credentials continue to work while Tower is unavailable. Removing a Nostr identity from Tower's login allowlist prevents new sign-ins; separately revoke native tokens or disable the Forgejo account when immediate access removal is intended.
+- Forgejo OAuth scopes are not implemented in the pinned provider; do not describe OAuth credentials as repository-scoped. Native effective permissions and branch protections apply on every request.
 
-## Authority rules
+## Verify
 
-- One Tower workspace maps to one Forgejo organization; repositories belong to that organization.
-- Workspace/repository UUIDs remain stable. The organization namespace and actor usernames are readable aliases.
-- Claim the organization namespace before creating the first repository. It becomes locked after repository creation.
-- Bootstrap headless actors through the Autopilot `forgejo bootstrap` CLI; see the organizations/users reference. Readiness and repository grants are separate.
-- Change actor usernames through Tower. The identity reconciler uses Forgejo's supported rename API.
-- Use the gateway-backed Forgejo Settings → Collaborators page to share with a Nostr repository administrator signature, or use Tower actor/stable-group grants. Reconciliation follows Tower; provider-only grants are not imported.
-- Tower workspace owners/admins map to Forgejo's stock Owners team. Other authorized actors are organization members without blanket repository access; exact repository access comes from Tower grants.
-- Git credentials are short-lived Tower capabilities obtained through a NIP-98-aware credential helper. Do not store Forgejo user tokens in repositories or agent environments.
-- The public gateway deliberately blocks Forgejo's API and credential-management surfaces. Never bypass it by publishing Forgejo port 3000.
-
-## Current capability matrix
-
-| Workflow | Current supported path |
-|---|---|
-| Human browser login | Gateway Nostr challenge and short Tower session |
-| Git clone/fetch/push | Stock Git plus Tower capability credential helper |
-| Organization/repository provisioning | Tower NIP-98 API plus on-demand reconciler |
-| Headless account bootstrap | Broker-signed Autopilot CLI → Tower → isolated identity worker |
-| User aliases | Tower actor-username API plus isolated identity reconciler |
-| Sharing | Forgejo collaboration URL → signed Tower actor/group sharing → stock provider reconciliation |
-| Issue list/read/create/comment | Tower NIP-98 issue API and isolated private broker |
-| Pull requests and reviews | Forgejo browser UI for authorized humans |
-| Actions/CI | Disabled and not yet safely bridged through the current gateway; requires the platform seam in the Actions reference |
-
-## Verification
-
-For every mutation, verify both authority and provider state:
-
-1. Tower shows the intended namespace, repository, grant, and ready reconciliation revision.
-2. Forgejo shows the expected organization membership and repository permission.
-3. The public gateway allows the authorized path and denies a foreign organization/repository.
-4. Git operations use the expected human/agent identity in audit and commit attribution.
-
-Do not treat a successful direct Forgejo edit as completion when Tower does not contain the matching state.
+Verify the authenticated native account, intended native permissions and a real operation through the shipped helper/API path. Change Write to Read in Forgejo and prove push denial using the same issued token; removing all effective read should deny private fetch. Branch protections remain authoritative. No Tower grant or reconciler result constitutes native access evidence.

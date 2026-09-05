@@ -1,81 +1,26 @@
-# Tower and Forgejo Setup
+# Tower authentication and stock Forgejo setup
 
-Use this reference for a new Tower, a first Forgejo deployment, ingress changes, provider identity bootstrap, or runtime recovery.
+Read the active Tower repository's `agents.md`, `README.md`, `docs/forgejo-native-auth-migration.md`, production env example and Compose manifest. The migration document supersedes historical `git-authority-v1` and rollout documents.
 
-## Read first
+The stack retains Tower OIDC, stock Forgejo 16.0.3 and an optional plain reverse proxy for the existing public URL. There are no identity/org/repository permission workers, issue broker, Tower capabilities or custom sharing intercept. Old worker bootstrap scripts are retired and must fail closed.
 
-In the active Tower repo, read:
+Configure `GIT_OIDC_ALLOWED_NPUBS` explicitly. Preserve `GIT_OIDC_ISSUER`, OIDC signing key, client ID/secret, callback URL and existing provider source/subject links. Keep secret files protected; never print resolved deployment environments. Provider reverse-proxy authentication must be off; native OAuth/API/Git must be reachable at the public Forgejo URL. Accounts register via the configured external provider. Never auto-link an existing account by matching an unverified alias/email.
 
-- `AGENTS.md` or `agents.md`
-- `README.md`
-- `docs/prod-deploy.md`
-- `docs/git-authority-v1.md`
-- `.env.prod.example`
-- `docker-compose.prod.yml`
+For existing deployments, use the repository's migration handoff. Stop all old workers and scheduled/on-demand launchers and retain actual task/process proof before cutover. Snapshot Tower DB, provider DB/data/config, account IDs and OIDC links, native teams/collaborators and branch protections. Preserve old Tower grant rows read-only for audit. Restore intended access once through native Forgejo APIs after writers are disabled. Do not restart old workers during rollback.
 
-Treat those files as authoritative for the checked-out version. The current stack pins stock Forgejo and keeps it private behind `git-gateway`.
+Validate with stock Forgejo plus the actual shipped Autopilot broker/helper: fresh registration/login, direct Git/API writes, expiry re-login, unlisted denial, native permission revocation with the same token, branch protections and Tower outage with a still-valid native token. Do not claim Lara is fixed until tested in her actual runtime.
 
-## Prepare configuration
+Autopilot configures `WINGMAN_FORGEJO_SERVERS` server-side as a JSON array of
+`{origin,towerIssuer,sourceName,clientId,redirectUri}` bindings. These are public
+routing/client identifiers, not credentials. The shipped helper version is 3.
+Native tokens are cached in process-private memory per actor and host; restart
+loses the cache and the next use signs in again. No token goes into disk, agent
+environment or remote URLs. Use the stock public OAuth client, not an admin
+application; preserve state, PKCE, CSRF and exact callback checks.
 
-For a fresh deployment, copy and complete the production template. For migration from an existing Tower, prefer the provided preparation script because it creates separate ignored Git secrets without printing them:
+## Portable skills
 
-```bash
-cd "${TOWER_REPO:-$HOME/code/wm/tower}"
-./scripts/prepare-tower-git-deployment.sh /absolute/path/to/existing/.env.prod
-docker compose --project-name wingman-tower --env-file .env.prod \
-  -f docker-compose.prod.yml config --quiet
-```
-
-Required Git settings include:
-
-- a unique capability hash key;
-- a unique internal gateway token;
-- `GIT_SERVICE_AUDIENCE`, normally `wingman-git`;
-- a unique Forgejo webhook secret;
-- a unique Tower-to-issue-broker token;
-- private Tower and Forgejo origins;
-- the exact public HTTPS `GIT_GATEWAY_BROWSER_ORIGIN`.
-
-Keep secret values in ignored files under `.runtime/tower-git-secrets/`. Do not reuse the Tower service nsec or place secrets in chat, argv, committed env files, or resolved Compose output.
-
-## Start the stack
-
-```bash
-docker compose --project-name wingman-tower --env-file .env.prod \
-  -f docker-compose.prod.yml up -d --build
-
-curl -fsS http://127.0.0.1:${TOWER_HOST_PORT:-3100}/health
-curl -fsS http://127.0.0.1:${GIT_GATEWAY_HOST_PORT:-3180}/health
-curl -fsS http://127.0.0.1:${GIT_GATEWAY_HOST_PORT:-3180}/ready
-```
-
-The expected services include Tower, Postgres, MinIO, Forgejo, the Git gateway,
-the isolated Git issue broker, identity reconciler, and organization/repository reconciler. Forgejo port 3000 and broker port 3190 must
-remain unpublished. Route the public Forgejo hostname to the gateway, not
-directly to either private service.
-
-## Bootstrap provider identities
-
-After Forgejo is healthy:
-
-```bash
-./scripts/bootstrap-forgejo-control.sh
-./scripts/bootstrap-forgejo-identity.sh
-./scripts/bootstrap-forgejo-oidc.sh
-```
-
-- `tower-reconciler` is a non-site-admin account used only for Tower-managed organizations and repositories.
-- `tower-identity-reconciler` is an isolated administrator used only by the isolated worker for supported external account creation, immutable identity linking, and username renames.
-
-Their tokens are mounted only into their dedicated reconciliation processes. Do not expose either token to Tower routes, the gateway, users, agents, or CI jobs.
-
-Configure `GIT_FORGEJO_OIDC_SOURCE_ID` in the deployment environment with the numeric ID of the **Tower** source from `forgejo admin auth list`. Never assume source ID 1. Run the identity worker from the same tested Tower image as the API. The organization worker needs its control token and webhook settings so it can retry pending repositories automatically. An API-only rollout leaves headless requests pending.
-
-For CapRover, deploy the Tower API, gateway, issue broker, identity reconciler and organization reconciler images/commands from the matching Tower release, and apply worker-specific environment/secrets. Keep the provider admin token only in the identity reconciler. The supervisor owns live restarts and deployment.
-
-## Portable skills rollout
-
-The canonical source is `OtherStuffAI/wm-skills`. Update its `forgejo-tower` directory, then sync the named skill into the runtime user's Codex/Claude skill directories on each Autopilot host using that repository's sync tool:
+The canonical source is `OtherStuffAI/wm-skills`. Sync only the requested skill into installed copies, preserving unrelated skills:
 
 ```bash
 python3 scripts/sync-skills.py sync --skill forgejo-tower \
@@ -84,23 +29,4 @@ python3 scripts/sync-skills.py check --skill forgejo-tower \
   --codex-dir "$HOME/.codex/skills" --claude-dir "$HOME/.claude/skills"
 ```
 
-Lara automatically syncs the published `OtherStuffAI/wm-skills` repository from GitHub. For Lara, push the canonical skills changes and fast-forward/push Autopilot's `deployed` branch; do not require a separate manual remote skill installation. Use the sync commands above for hosts without that automation. Open a fresh agent session after rollout.
-
-## Ingress and login smoke
-
-Verify:
-
-- an anonymous browser is redirected to `/auth/login`;
-- a valid Nostr login reaches the Forgejo home page;
-- an authorized user can open their organization and repository;
-- a user without a Tower grant receives a non-disclosing denial;
-- public `/api/v1`, registry, internal login, registration, and credential-management paths remain blocked;
-- a signed Tower issue create succeeds for an actor with repository write/admin authority and appears under that actor's applied Forgejo username.
-
-Gateway restarts invalidate browser sessions by design.
-
-## Data and recovery
-
-Forgejo data lives in its persistent Docker volume. Tower authority and Forgejo provider data must both be backed up. Do not delete volumes to repair membership, aliases, or reconciliation drift. Reconcile from Tower first.
-
-Only wipe Forgejo data when the user explicitly requests a destructive reset and confirms that repositories, issues, pull requests, attachments, Actions history, and provider configuration may be lost. Resolve the exact Compose project and volume names before removal.
+Lara's automation pulls the published canonical skill. Source commits and local sync do not prove her deployed helper or runtime changed. For a task awaiting manager review, commit tested state and provide evidence; do not push, deploy or restart Autopilot. Follow the task's explicit rollout authorization.

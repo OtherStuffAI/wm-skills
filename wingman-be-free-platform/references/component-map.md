@@ -6,7 +6,7 @@ Read this reference when locating code or deciding where a feature and its state
 
 Typical repo: `~/code/wm/tower` or `~/code/wingmanbefree/wingman-tower`.
 
-Owns workspaces, membership, group UUIDs and epochs, NIP-98 verification, typed Flight Deck PG APIs, storage metadata, Git authority, Forgejo reconciliation, OpenAPI, migrations, and graph routes.
+Owns workspaces, membership, group UUIDs and epochs, NIP-98 verification, typed Flight Deck PG APIs, storage metadata, allowlisted Nostr OIDC authentication for Forgejo, OpenAPI, migrations, and graph routes.
 
 Start with:
 
@@ -48,7 +48,7 @@ Inspect `$WINGMAN_URL`, env, and app registry before assuming a port. Do not sta
 
 ## Forgejo
 
-Forgejo runs inside Tower's Docker stack. It stores Git objects and provides the repository, issue, pull-request, review, and optional Actions UI. It is not the source of truth for Wingman identity or grants.
+Forgejo runs inside Tower's Docker stack. It stores Git objects and provides the repository, issue, pull-request, review, and optional Actions UI. Tower authenticates allowlisted Nostr identities only. Forgejo owns native accounts, usernames, organizations, teams, collaborators, all repository permissions, OAuth credentials, Git and API operations. No Tower Git grant or permission reconciliation applies.
 
 Use the `forgejo-tower` skill for all Forgejo setup and collaboration work.
 
