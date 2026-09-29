@@ -11,6 +11,7 @@ Sanitized, portable skills for working on Wingman Be Free.
 - `wapps`: WApp integration and operation
 - `wingman-deploy`: deployed-branch release workflow
 - `artifacts`: Artifact WApp and visual review surfaces
+- `wingman-first-setup`: first Tower workspace, Autopilot, sovereign bot, transport, and Flight Deck connection
 
 The platform skill is intentionally short. Conditional operating detail belongs in its references or the specialist skill that owns the workflow.
 
@@ -31,6 +32,14 @@ python3 scripts/sync-skills.py sync \
 ```
 
 It replaces only this repository's named skill directories. Restart the client or begin a new session after syncing so skills are rediscovered.
+
+For the first-setup skill alone, the `packages/setup` npm package installs it without cloning this repository. Once published to npm, run `npx @wingmanbefree/setup` (or add `--target claude`). The package bundles the canonical `wingman-first-setup` directory at pack time. Before publication, you can use this Git checkout directly:
+
+```bash
+cd packages/setup
+npm pack
+npx --yes --package ./wingmanbefree-setup-0.1.0.tgz wingman-setup
+```
 
 Check drift without modifying installed copies:
 
