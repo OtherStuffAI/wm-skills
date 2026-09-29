@@ -3,13 +3,24 @@ name: wingman-first-setup
 description: "Guide a user through a first Wingman Be Free setup: Docker or native Bun Autopilot, Tower workspace, sovereign bot, and Flight Deck connection over HTTPS, local HTTP, or FIPS."
 ---
 
-# Wingman first setup (pilot v0.2)
+# Wingman first setup (pilot v0.3)
 
 Help the user reach a verified loop: their bot runs in their Autopilot, belongs to their Tower workspace, appears in Flight Deck, and answers a test message. This is an interactive setup guide, not an unattended provisioner. Inspect the current release and its documentation before commands; setup contracts can change. Never claim a step succeeded from a command exit code alone.
 
-## Start with a setup record
+## Interview and setup manifest
 
-On the first run, inspect what is already installed, then ask one compact set of questions for the remaining choices: Tower origin and workspace owner, target host/OS, Docker or native Bun, transport (public HTTPS, local HTTP, FIPS only, or HTTPS plus FIPS), bot name, and agent harness. Explain any access the chosen path needs. Proceed with the answers; ask again only for a missing choice that blocks the next step. Keep choices, completed steps, observed public IDs/URLs, blockers, and next action in a short local record. Resume from observed state; do not create another workspace, bot, or connection after a restart.
+Interview the user in short turns. Inspect the host and existing agent tools first. Ask one decision or two related decisions at a time, explain the consequence, and use an answer already given rather than repeating the question. Do not present an eight-item questionnaire or ask the user to compose a semicolon-separated setup string.
+
+Maintain `.wingman-first-setup.json` in the chosen setup working directory using [the manifest contract](references/setup-manifest.md). Store only choices, public IDs/URLs, observed step states, blockers, and next action; set mode `0600`. Never put signing keys, tokens, passwords, or recovery material in it. Resume from observed state, including existing workspace, bot, and connection records; do not create duplicates after a restart.
+
+Ask in this order unless context has already answered a question:
+
+1. **Tower:** Offer the **Other Stuff Hosted Tower** at `https://tower-stable-api.b.otherstuff.ai/` as the default, or a new self-hosted Tower. Tell the user the hosted offer described for this pilot includes 1 GB per month free, then storage is paid per GB per month; verify the current rate and billing terms before a paid commitment. For self-hosted Tower, establish host, admin authority, and current deployment instructions. Ask whether to use an existing workspace or create one, and its name.
+2. **Human identity:** Ask for the user's public `npub`. If they do not have one, offer to install/build Wingman App and generate an identity in its own onboarding vault. Check current Wingman App release/build instructions and platform support before promising an install. Explain that Wingman App's device npub and human account npub are different; use the human npub as Tower owner. Never ask them to send an `nsec`.
+3. **Agent runtime:** Ask whether agent tools are already installed on the target computer and whether the user wants to use those installations or keep agents isolated. If using existing tools, prefer native Bun when available. If isolated, select Docker. Inspect actual installed harnesses before asking which one should run the first bot; do not assume the setup-skill installer installed the harness binaries.
+4. **Connection:** Ask for target host/OS if it is not the current machine, then choose local HTTP, public HTTPS, FIPS only, or HTTPS plus FIPS. Ask for the bot name. Explain any transport limitation before proceeding.
+
+When the choices and authority are complete, show a short human-readable summary, run `node <skill-directory>/scripts/check-manifest.mjs .wingman-first-setup.json --ready`, then apply its values through the current supported Autopilot, Tower, Wingman App, and transport setup commands below. The manifest is the input to the staged setup; this pilot does not have a single unattended provisioner. Keep the JSON and step evidence current after each operation. An optional form can later produce the same manifest without changing the execution flow.
 
 Public HTTP and FIPS HTTP are distinct. Local HTTP belongs on loopback or an explicitly trusted private test network. Internet access uses HTTPS. A FIPS URL has the form http://<node-npub>.fips:<port>/ and needs a working peer; it is not a public HTTP deployment.
 
@@ -19,6 +30,7 @@ Public HTTP and FIPS HTTP are distinct. Local HTTP belongs on loopback or an exp
 - Use the user's chosen checkout or current official Autopilot release. Read its README.md, docs/setup.md and relevant FIPS docs, plus repository agent instructions. Do not run a remote installation script unseen.
 - Check disk, runtime, Docker Compose v2 or Bun, persistent storage, and the chosen harness's login requirements. Choose a durable process manager for native Bun and record backup/restart ownership.
 - Keep owner, Tower service, workspace service, Autopilot installation, FIPS node, and bot npubs distinct. Never ask for an nsec, provider token, or capability in chat or Tower connection metadata. Bot private identity stays in Autopilot's vault; sessions use brokered capabilities.
+- The npm installer installs this skill into Codex, Claude Code, Goose, and OpenCode skill directories by default. Verify the chosen agent CLI is actually present and authenticated; install or authenticate it only through its current supported flow.
 
 ## 2. Install or inspect Autopilot
 
@@ -35,7 +47,7 @@ Public HTTP and FIPS HTTP are distinct. Local HTTP belongs on loopback or an exp
 
 ## 4. Create or select the Tower workspace
 
-List the owner's existing workspaces first and reuse the intended one. Current Tower has an admin-only POST /api/v4/admin/flightdeck-pg/workspaces bootstrap route with workspace_name and creator_npub; it creates the PG workspace and defaults. Use an authorized Tower admin signing path for that exact request or the supported Flight Deck flow. A normal bot or new owner's npub is not automatically a Tower admin. Never seek a human secret as a workaround.
+For the selected Tower, list the owner's existing workspaces first and reuse the intended one. Current Tower has an admin-only POST /api/v4/admin/flightdeck-pg/workspaces bootstrap route with workspace_name and creator_npub; it creates the PG workspace and defaults. Use an authorized Tower admin signing path for that exact request or the supported Flight Deck flow. A normal bot or new owner's npub is not automatically a Tower admin. Never seek a human secret as a workaround. If the hosted service lacks a user-authorized workspace creation path, stop at that exact blocker rather than presenting the admin endpoint as a user operation.
 
 Read back the workspace descriptor and membership. Confirm owner npub, creator membership, app namespace, defaults, and that the user can open it in Flight Deck. If no authorized creation path exists, report this blocker precisely.
 

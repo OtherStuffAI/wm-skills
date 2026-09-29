@@ -38,7 +38,7 @@ For the first-setup skill alone, the `packages/setup` npm package installs it wi
 ```bash
 cd packages/setup
 npm pack
-npx --yes --package ./wingmanbefree-setup-0.1.0.tgz wingman-setup
+npx --yes --package ./wingmanbefree-setup-0.2.0.tgz wingman-setup
 ```
 
 Check drift without modifying installed copies:
