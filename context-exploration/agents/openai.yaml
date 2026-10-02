@@ -1,0 +1,4 @@
+interface:
+  display_name: "Context Exploration"
+  short_description: "Locate work in scope trees and read selected sources"
+  default_prompt: "Use $context-exploration to locate the relevant component and inspect selected authoritative sources."
