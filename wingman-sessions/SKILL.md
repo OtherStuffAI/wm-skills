@@ -1,6 +1,6 @@
 ---
 name: wingman-sessions
-description: Inspect and acknowledge work handled during a running Wingman Autopilot session, including revision-checked prompt queues and supervised dispatch callback inboxes. Use for queued-message accumulation, duplicate follow-up turns, and manager-session supervision.
+description: Inspect and acknowledge work handled during a running Wingman Autopilot session, recover uncertain deliveries, and manage revision-checked prompt queues and supervised dispatch callback inboxes. Use for queued-message accumulation, duplicate follow-up turns, and manager-session supervision.
 ---
 
 # Active session work
@@ -32,6 +32,22 @@ Agent queue operations use the local capability broker and are bound to the curr
 A failed HTTP response does not prove that the agent rejected a prompt. Inspect delivery state and evidence before resolving an uncertain claim; never automatically replay work that may already have been accepted.
 
 Do not clear the queue, delete items blindly, acknowledge merely because an item was read, or mark work handled solely to prevent another turn. Acknowledge completion only after the associated action or considered response is complete. Before ending, inspect again: newly arrived work remains pending independently.
+
+## Resolving uncertain delivery
+
+If `deliveryActive` is true, the item is still Dispatching and reconciliation is refused. After a delivery attempt finishes, an uncertain claim is shown as unresolved. A claimed item may have crossed the send boundary even when no HTTP response arrived. Wait until the delivery attempt has finished, inspect its `deliveryId`, claim state and supporting output, then resolve the exact claim with the revision and claim token returned by list:
+
+```bash
+bun clis/wingman.ts session queue reconcile <item-id> \
+  --revision <revision-from-list> \
+  --claim-token <claim-token-from-list> \
+  --resolution accepted \
+  --reason "Confirmed this delivery was accepted; matching result inspected"
+```
+
+`accepted` records verified acceptance without sending again. `--resolution retry` explicitly permits another delivery and may duplicate an earlier accepted attempt. Choose it only after considering the evidence, duplicate consequences and task authority; explain the decision in the reason. Neither a lost response nor elapsed time proves rejection. Do not reconcile a delivery that is still active, guess its token, or refresh a changed revision merely to bypass a conflict. Unresolved delivery remains visible and is never automatically replayed after a timeout.
+
+Queue history is bounded: the API/UI retains at most 100 recent full handled events, with terminal retry metadata retained for up to seven days and the most recent 1,000 terminal records per session. Older records may have compacted content; beyond the retained retry window, a missing item is not proof that it was never handled. Pending and unresolved claims are not pruned.
 
 ## Supervised dispatch callbacks
 
