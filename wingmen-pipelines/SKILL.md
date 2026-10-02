@@ -36,7 +36,19 @@ Read `references/pipeline-operations.md` when you need exact commands, JSON exam
 - Give agent sessions explicit goal metadata. Keep `nextAction=reflect` while implementation, review, or reporting remains; use `stop` only when genuinely complete.
 - Require the manager step to inspect callback fields and independent repository/evidence state. Never treat a worker's completion claim as automatic acceptance.
 - Keep deterministic pipeline steps responsible for task comments, state changes, and chat handoff when the definition assigns them that role.
-- Use ordinary `wingman.ts dispatch create/status/acknowledge/close` outside a declarative agent step. If its terminal callback is missing, inspect dispatch status explicitly.
+- Use ordinary `wingman.ts dispatch create/status/inbox/acknowledge/close` outside a declarative agent step. A running manager can inspect and close handled callbacks before a wake turn occurs. Read the `wingman-sessions` skill for callback inbox handling and revision-checked acknowledgement of ordinary queued prompts; these are separate stores. If a terminal callback is missing, inspect dispatch status explicitly.
+
+## Pipeline architecture convention
+
+Define pipelines at a human and agent relevant level. The visual view must faithfully show the actual defined steps and child pipelines; do not invent presentation-only groups to conceal poor step boundaries.
+
+- **Function:** one coherent operation with understandable inputs and outputs. Keep preparation, field mapping, transformation, validation and response normalization inside the reusable library function when they only support that operation. Internal helpers remain inspectable through the function library/code without becoming top-level pipeline steps.
+- **Pipeline step:** a meaningful action whose separate visibility helps a human or agent understand or control the work, such as retrieving tweets, drafting a response or publishing a reply.
+- **Child pipeline:** a reusable workflow with meaningful stages, branching, loops or independent inspection, retry or failure boundaries. Use it when a sequence merits its own workflow, rather than creating a child pipeline for every small adapter.
+
+Review every consecutive sequence of code steps: does seeing each step separately help someone understand or control the work? If it only prepares and reshapes data for one core operation, combine it into a library function. For example, process message → map fields → execute code → normalize response should ordinarily be one coherent function step. If the sequence represents a workflow worth inspecting separately, make it a child pipeline with a clear input/output contract. Keep genuinely independent decisions, approvals, side effects and retry/failure boundaries explicit; do not merge them merely to reduce node count.
+
+Apply this convention when creating or revising pipelines and flag existing violations during review. Preserve execution semantics, validation, evidence and safe retry behaviour when consolidating. This standard encourages function and pipeline reuse; it does not authorize an unrelated bulk refactor of existing pipelines.
 
 ## Pipeline Building Rules
 

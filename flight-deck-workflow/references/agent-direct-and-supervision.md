@@ -56,7 +56,7 @@ Add an execution-contract task comment before or when work starts. Keep validati
 
 ## Dispatch A Supervised Worker
 
-Use `wingman.ts dispatch create` as the ordinary session-to-session path. Prefer a prompt file so the handoff remains reviewable and avoids shell quoting errors.
+Use `wingman.ts dispatch create` as the ordinary session-to-session path. Prefer a prompt file under verified Git-ignored `tmp/docs/handoffs/`, and ensure it is untracked, so the operational handoff remains reviewable without publishing private context.
 
 ```bash
 cd "${AUTOPILOT_REPO:-$HOME/code/wm/autopilot}"
@@ -64,7 +64,7 @@ bun clis/wingman.ts dispatch create \
   --agent codex \
   --directory <working-directory> \
   --name "<short worker name>" \
-  --prompt-file <repo-local-handoff.md>
+  --prompt-file <repo>/tmp/docs/handoffs/brief.md
 ```
 
 Callbacks default to the calling session through `SESSION_ID`. Use unmonitored dispatch only when the user explicitly wants it; `--callback false` removes the durable supervisor callback.
@@ -83,6 +83,14 @@ bun clis/sessions.ts metadata-update <worker-session-id> --next-action stop
 ```
 
 ## Review And Close The Dispatch
+
+Callbacks are stored in a durable callback inbox, separately from the ordinary prompt queue. Inspect live unresolved callbacks during supervision and when Autopilot sends an inbox wake:
+
+```bash
+bun clis/wingman.ts dispatch inbox
+```
+
+A running session can review, report and acknowledge/close a handled callback before its wake turn; it need not wait for another turn. Close only callbacks actually reviewed. A callback arriving later stays unresolved. Read the `wingman-sessions` skill for the separate ordinary queue acknowledgement workflow.
 
 The callback is a durable notification, not automatic acceptance. Inspect the worker callback and the claimed evidence. For implementation, inspect the live worktree, diff, tests/build results, commit, and push state. Re-dispatch a focused pickup when required.
 

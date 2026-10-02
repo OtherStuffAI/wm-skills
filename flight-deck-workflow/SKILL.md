@@ -5,6 +5,10 @@ description: "Operate Wingman Flight Deck safely through Tower's typed PG record
 
 # Flight Deck Workflow
 
+## Operational handoff storage
+
+Keep worker briefs, handoffs, run-specific evidence and private device records in Git-ignored `tmp/docs/handoffs/`, or on the authorized task/doc/file surface. Verify `git check-ignore` and that the destination is untracked before writing. Preserve and untrack accidentally tracked operational files; ignore rules do not remove historical exposure. Keep reusable product docs and code tracked.
+
 ## Purpose
 
 Treat Flight Deck as the human coordination surface and Tower as its shared system of record. Use Autopilot for sessions, Agent Direct, supervised dispatch, pipelines, triggers, and managed apps.
@@ -34,6 +38,10 @@ bun clis/wingman.ts flightdeck task comments <task-id> --workspace <workspace-id
 The removed `wingman.ts board` path is not a fallback. If `flightdeck` lacks an operation, use a NIP-98 signed typed Tower route under `/api/v4/flightdeck-pg`. Record a missing typed route as a product gap; do not revive Yoke or encrypted-record board tooling.
 
 Read [references/agent-direct-and-supervision.md](references/agent-direct-and-supervision.md) before handling Agent Direct implementation, creating task-backed work from chat, supervising another session, or changing session goal/next-action metadata.
+
+## Work arriving during an active turn
+
+Read the `wingman-sessions` skill when managing a working session's queue or supervised callback inbox. Inspect pending work at useful milestones and before final handoff. Read the authoritative referenced thread/task before acting, then acknowledge only the exact queue revision handled. Dispatch callbacks use their own inbox and acknowledge/close operations. Keep unhandled work pending; do not clear the queue to suppress future turns.
 
 ## Handle Agent Direct
 
@@ -191,7 +199,14 @@ POST /api/v4/flightdeck-pg/workspaces/:workspaceId/docs/:docId/comments
 
 ## Mentions And Links
 
-Use Flight Deck mention tags when referencing records. Do not paste raw UUIDs when a mention can be used.
+Use Flight Deck mention tags when referencing records. Do not paste raw UUIDs when a mention can be used. Agent-directed writes require both the visible canonical `@[Label](mention:agent:<npub>)` tag and a matching structured `mentions` entry with that exact agent npub. Derive both from one `{ npub, label }` value; visible body text alone is not routing authority. Use a broker-aware helper specified by local agent instructions when available.
+
+```json
+{
+  "body": "@[Agent](mention:agent:<npub>) Continue the task.",
+  "mentions": [{ "type": "agent", "npub": "<npub>", "label": "Agent" }]
+}
+```
 
 Preferred helper:
 
@@ -207,6 +222,7 @@ Mention forms:
 @[Message](mention:message:<message-id>)
 @[Document Title](mention:document:<doc-id>)
 @[Person Name](mention:person:<npub>)
+@[Agent Name](mention:agent:<npub>)
 ```
 
 ## Workspace Discipline

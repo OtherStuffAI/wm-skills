@@ -7,6 +7,7 @@ Sanitized, portable skills for working on Wingman Be Free.
 - `wingman-be-free-platform`: compact architecture and routing entrypoint
 - `forgejo-tower`: Tower-backed Forgejo setup, organizations, repositories, users, sharing, issues, Actions, and CI
 - `flight-deck-workflow`: Flight Deck and supervised work
+- `wingman-sessions`: active-session prompt acknowledgement and dispatch callback inbox handling
 - `context-exploration`: scope component trees, selected authoritative sources, and authorized structure management
 - `wingmen-pipelines`: Autopilot declarative pipelines
 - `wapps`: WApp integration and operation
