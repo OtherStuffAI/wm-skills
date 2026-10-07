@@ -95,6 +95,10 @@ Use files/storage for binary or external artifacts:
 
 ## Files And Attachments
 
+For explicit anonymous publishing of an existing file version, read
+[Blossom publication](references/blossom-publication.md). This covers the Files
+panel, supported CLI, permissions, version selection and unpublish consequences.
+
 Treat uploaded files and `storage://` links as source evidence. Read or resolve them before answering if the user references them.
 
 Use files when the content is naturally binary or external. Use documents when the content should be editable, searchable, commented on, or used as a written deliverable inside Flight Deck.
