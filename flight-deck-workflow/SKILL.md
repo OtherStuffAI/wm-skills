@@ -95,7 +95,7 @@ Use files/storage for binary or external artifacts:
 
 ## Files And Attachments
 
-For explicit anonymous publishing of an existing file version, read
+For explicit anonymous publishing of an existing chat image/file attachment or file version, read
 [Blossom publication](references/blossom-publication.md). This covers the Files
 panel, supported CLI, permissions, version selection and unpublish consequences.
 

@@ -1,9 +1,53 @@
-# Publish an existing file version to Blossom
+# Publish existing attachments and file versions to Blossom
 
 Use this operation only when the user authorizes making the selected bytes
 anonymously public. An existing hash link for a private file does not itself
 publish it. Ordinary uploads and channel attachments remain private according
 to their existing permissions.
+
+For a chat image/file attachment, use its actual source message and existing
+`storage_object_id`. Read the authoritative message first. Never create a File,
+copy/reupload bytes, remove its message link, or substitute the human owner to
+bypass denied source permission.
+
+```bash
+bun clis/wingman.ts flightdeck attachment blossom <storage-id> \
+  --message <message-id> --workspace <workspace-id> --json
+bun clis/wingman.ts flightdeck attachment publish <storage-id> \
+  --message <message-id> --workspace <workspace-id> --public --json
+bun clis/wingman.ts flightdeck attachment unpublish <storage-id> \
+  --message <message-id> --workspace <workspace-id> --json
+```
+
+Attachment status requires `channel.read`; changes also require `channel.write`
+on the actual source channel and workspace membership. Agents must participate
+in the owning thread when there is one. A bare storage ID or uploader identity
+is not publication authority. The CLI reads status and pins public consent to
+its observed `link_id` and verified SHA-256 before publishing. The chat action
+and chat-sourced Files row offer the same publication panel. Only stored bytes
+become public; message text, filenames and attachment metadata remain private.
+
+Return `attachment.blossom_url` only after the selected attachment reports public
+with its verified hash. Internet URLs use Tower's configured HTTPS
+`SUPERBASED_DIRECT_HTTPS_URL` origin; `BLOSSOM_PUBLIC_ORIGIN` optionally overrides
+it for a distinct public origin, including private transport callers. Do not invent a URL from
+unverified metadata or retry through a different identity.
+
+Attachment publish/unpublish is idempotent and actor-specific. Other actors,
+File versions and identical-byte references remain independent. Removing the
+attachment link or deleting its message/thread withdraws that source's public
+eligibility. Reattaching the same storage object creates a new link lifetime and
+requires fresh consent; it never revives old publication automatically. Revoked
+source channel write permission also makes that actor's reference ineligible.
+Incomplete/missing bytes cannot be published. Changed bytes reject stale consent
+and cannot replace a previously published link hash: attach a new object.
+
+The attachment Tower route is GET/PUT/DELETE
+`/api/v4/flightdeck-pg/workspaces/:workspaceId/messages/:messageId/attachments/:storageObjectId/blossom`.
+PUT requires `{public:true, expected_link_id, expected_sha256}` from status.
+A 409 can mean source-link identity or bytes changed; reread status and the
+request before retrying. A 404 can mean the source is removed/deleted/inaccessible,
+not permission to copy it elsewhere.
 
 From the active Autopilot checkout, inspect publication status and version IDs:
 
