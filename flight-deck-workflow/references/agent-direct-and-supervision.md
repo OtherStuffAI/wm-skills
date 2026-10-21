@@ -15,8 +15,8 @@ bun clis/wingman.ts flightdeck thread read <thread-id> \
 
 3. Treat the fetched thread as authoritative context. Treat only newly eligible human messages as instructions for the current turn.
 4. Skip only when the trigger author is genuinely this agent, its mapped bot identity, or its mapped workspace key. Record the skip reason when the runtime supports dispatch outcomes.
-5. Ensure the user sees prompt receipt. Prefer Autopilot's `accepted` activity (`Message received`); otherwise send one concise same-thread acknowledgement.
-6. Keep the same thread informed when a task is created, a blocker changes the plan, or the supervised work reaches a meaningful milestone. Avoid noisy heartbeat updates.
+5. For substantial work, send one concise acknowledgement through the broker-aware chat tool or supported CLI into the originating thread and confirm success. Autopilot activity, session commentary and task comments do not substitute for that persisted chat reply.
+6. The supervising manager posts same-thread updates when the implementation path is established, a blocker or scope changes, the main change is ready, and validation/activation finishes. Keep evidence on the task. Keep worker-directed coordination in agent sessions/task records and translate it into human-readable status for chat. Avoid noisy heartbeat updates.
 7. Return the final in the same thread. If Agent Direct publishes the session's normal final verbatim, make that final the user-facing update and do not call a reply helper again.
 
 ## Turn Chat Into Task-Backed Work
@@ -50,7 +50,8 @@ Make both the task and worker brief self-contained. Include:
 - source thread/task/document mentions and required files;
 - constraints, especially preservation of concurrent work and restart/deploy authority;
 - acceptance criteria and exact validation expectations;
-- required task comments, state transition, callback evidence, and final reporting destination.
+- required task comments, state transition, callback evidence, and final reporting destination;
+- manager session ID, Autopilot checkout/URL or connection context where needed, and the verified communication command below.
 
 Add an execution-contract task comment before or when work starts. Keep validation, blockers, changed files, commits, and handoff evidence on the task. Move it to `review` only after managerial review passes.
 
@@ -66,6 +67,30 @@ bun clis/wingman.ts dispatch create \
   --name "<short worker name>" \
   --prompt-file <repo>/tmp/docs/handoffs/brief.md
 ```
+
+Every brief includes this routing block with actual operational values in the ignored brief only. Reusable tracked docs retain placeholders; never embed tokens:
+
+```text
+Manager session: <manager-session-id>
+Autopilot checkout and connection: <checkout>; <URL/connection context if needed>
+Worker session: use calling SESSION_ID; manager retains returned worker/dispatch IDs.
+Task/report destination: <workspace/task>; <originating channel/thread>; <ignored evidence path>
+Read installed flight-deck-workflow (including readable task updates) and wingman-sessions.
+Ask manager (current broker scope): bun <autopilot-checkout>/clis/sessions.ts send <manager-session-id> "<worker session/task; decision; recommendation; blocking status>" --bot-crypto --json
+Prefer queue-add only if specifically authorized for this destination:
+bun <autopilot-checkout>/clis/sessions.ts queue-add <manager-session-id> "<question and routing context>" --bot-crypto --json
+Verify live command/connection behavior; no key or owner impersonation fallback.
+Check YOUR queue before work, at milestones/decisions, validation and handoff:
+bun <autopilot-checkout>/clis/wingman.ts session queue list
+Immediately consume each exact incorporated revision; track unfinished actions on task/plan:
+bun <autopilot-checkout>/clis/wingman.ts session queue consume <item-id> --revision <read-revision> --reason "<what was incorporated>"
+Continue independent work while awaiting answers; pause dependent actions.
+Return completion through normal supervised callback; do not queue a duplicate final.
+```
+
+Queue-add requires destination authority and is not an immediate interrupt. Send may queue while busy; inspect its response. Follow `wingman-sessions` for scope, revision-conflict, uncertain-delivery safeguards and verified acknowledge compatibility when consume is unavailable. Report the route gap explicitly. These are brief instructions only, not runtime-injected policy.
+
+The manager retains worker session/dispatch IDs, checks its own queue and worker progress during active supervision, consumes incorporated questions, and answers the exact worker using the supported authorized send command. Workers and manager check their own queues regularly during active work. Do not imply background polling after the turn stops.
 
 Callbacks default to the calling session through `SESSION_ID`. Use unmonitored dispatch only when the user explicitly wants it; `--callback false` removes the durable supervisor callback.
 
@@ -90,7 +115,7 @@ Callbacks are stored in a durable callback inbox, separately from the ordinary p
 bun clis/wingman.ts dispatch inbox
 ```
 
-A running session can review, report and acknowledge/close a handled callback before its wake turn; it need not wait for another turn. Close only callbacks actually reviewed. A callback arriving later stays unresolved. Read the `wingman-sessions` skill for the separate ordinary queue acknowledgement workflow.
+A running session can review, report and acknowledge/close a handled callback before its wake turn; it need not wait for another turn. Close only callbacks actually reviewed. A callback arriving later stays unresolved. Read the `wingman-sessions` skill for the separate ordinary queue consume-on-incorporation workflow.
 
 The callback is a durable notification, not automatic acceptance. Inspect the worker callback and the claimed evidence. For implementation, inspect the live worktree, diff, tests/build results, commit, and push state. Re-dispatch a focused pickup when required.
 

@@ -40,7 +40,7 @@ Read [references/component-map.md](references/component-map.md) when choosing a 
 ## Routing
 
 - For Flight Deck chat, tasks, documents, Agent Direct, or supervised work, use `flight-deck-workflow`.
-- For active-session queues, handled-item acknowledgement, or supervised callback inboxes, use `wingman-sessions`.
+- For active-session queues, consume-on-incorporation, two-way manager/worker communication, or supervised callback inboxes, use `wingman-sessions`.
 - For Tower-backed Forgejo installation, organizations, repositories, users, sharing, issues, Actions, or CI, use `forgejo-tower`.
 - For declarative pipelines, use `wingmen-pipelines`.
 - For WApp runtime/API work, use `wapps`.

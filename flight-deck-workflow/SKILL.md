@@ -5,9 +5,46 @@ description: "Operate Wingman Flight Deck safely through Tower's typed PG record
 
 # Flight Deck Workflow
 
+## Same-thread progress updates
+
+For substantial work requested in Flight Deck chat, post a brief acknowledgement into the originating workspace/channel/thread before continuing. Use the broker-aware Flight Deck chat tool or supported CLI; runtime activity, session commentary, task comments and worker logs do not substitute for a persisted chat message. Confirm the write succeeded; if it fails, report the delivery failure plainly.
+
+While work is active, post concise same-thread updates when the implementation path is established, a blocker or scope changes, the main change is ready, and validation or activation finishes. Keep technical evidence on the task and link it from chat. Do not flood the thread with heartbeat messages or raw worker output. The manager owns these updates even when Claude or another worker does the implementation.
+
+Keep internal coordination addressed to the worker or manager session and on the task; translate it into a user-readable status before posting to the human thread. Do not tell the user “you own activation” when the intended recipient is another agent.
+
+Let Agent Direct publish the normal final response once when that is its contract. Do not also send that final with a reply helper. The final must explain the delivered experience, verification, limitations and next owner; include the verified build number when the app changed. Never imply continued monitoring without an active process.
+
 ## Operational handoff storage
 
 Keep worker briefs, handoffs, run-specific evidence and private device records in Git-ignored `tmp/docs/handoffs/`, or on the authorized task/doc/file surface. Verify `git check-ignore` and that the destination is untracked before writing. Preserve and untrack accidentally tracked operational files; ignore rules do not remove historical exposure. Keep reusable product docs and code tracked.
+
+## Readable task descriptions and updates
+
+Apply this standard to task descriptions, task comments, and final responses that the runtime publishes as task comments. Tasks serve both users and future agents: retain the technical history and make its meaning easy to read.
+
+- Start with a short plain-language paragraph that a user can understand on its own. For descriptions, explain the problem and intended outcome. For updates, explain what happened or was learned, the current status, and any next action or blocker. Avoid leading with internal identifiers, hashes, commands, or unexplained jargon.
+- Keep useful technical detail after the opening paragraph: diagnosis, implementation constraints, decisions, validation commands and results, versions, and evidence needed for another agent to resume. Do not replace a self-contained task brief with an oversimplified summary.
+- Use real paragraph breaks and Markdown to organize the detail. Use bullets for parallel findings, numbered lists for sequences, short headings for longer updates, inline code for identifiers, and fenced code blocks with a language label where useful for commands, code, or log excerpts. Leave blank lines around lists and code blocks. Avoid packing unrelated findings into one long sentence or paragraph.
+- Distinguish planned work, implemented changes, validation, and live verification. A readable summary must preserve limitations and uncertainty.
+- Use readable record links or mention tags; keep machine routing identifiers out of the opening paragraph. Put long logs or evidence in a linked document or authorized handoff when appropriate, preserving essential context on the task.
+- Before posting, read the opening paragraph alone: does it tell the user what this task or update means? Then check that the detail is easy to scan and sufficient for another agent. Preserve actual newlines through the write tool, and read back substantial writes to verify formatting.
+
+Example progress comment (illustrative, not a completion claim):
+
+> The request included both the timeline and tweet count, but a later check rejected it and asked for information already supplied. The cause is identified; the fix still needs implementation and a live check.
+>
+> **Technical findings**
+>
+> - Extraction recognized Following and count `20`.
+> - The support check rejected the request before retrieval ran.
+> - The displayed clarification concealed that rejection.
+>
+> **Next step**
+>
+> Correct the rejection handling, then verify that the original request retrieves 20 Following tweets.
+
+Scale formatting to the amount of information; a short update does not need a fixed set of headings.
 
 ## Purpose
 
@@ -41,14 +78,14 @@ Read [references/agent-direct-and-supervision.md](references/agent-direct-and-su
 
 ## Work arriving during an active turn
 
-Read the `wingman-sessions` skill when managing a working session's queue or supervised callback inbox. Inspect pending work at useful milestones and before final handoff. Read the authoritative referenced thread/task before acting, then acknowledge only the exact queue revision handled. Dispatch callbacks use their own inbox and acknowledge/close operations. Keep unhandled work pending; do not clear the queue to suppress future turns.
+Read the `wingman-sessions` skill when managing a working session's queue or supervised callback inbox. Inspect pending work at useful milestones and before final handoff. Read the authoritative referenced thread/task before acting, then immediately consume only the exact queue revision incorporated into context/plan. Consumption is not completion: retain outstanding actions on the task/plan. Dispatch callbacks use their own inbox and acknowledge/close operations. Keep unincorporated or unrelated work pending; do not clear the queue to suppress future turns.
 
 ## Handle Agent Direct
 
 Treat the complete current thread as authoritative. Do not rely on a dispatch excerpt or turn historical quoted text into a new instruction.
 
 - Skip a dispatch only after confirming the triggering record was genuinely authored by this agent, its mapped bot identity, or its mapped workspace key. Do not infer self-authorship from mentions, labels, or quoted content.
-- Acknowledge receipt promptly through the runtime's accepted activity or a concise same-thread reply.
+- For substantial work, acknowledge receipt promptly with a persisted same-thread chat reply; runtime activity alone is insufficient.
 - Keep meaningful progress, task creation, blockers, and completion connected to the originating thread while supervised work runs.
 - Let the Agent Direct runtime publish the normal final response verbatim when that is its contract; do not create a duplicate final with a reply helper.
 
@@ -129,6 +166,18 @@ Keep chat replies concise:
 If the answer is long, create or update a document and reply in chat with a short summary plus the document mention.
 
 If the work belongs on a task, update the task first, then reply in chat with the task mention and current state.
+
+## Human-friendly final updates for substantial work
+
+For Pete-facing handoffs, explain the delivered experience in plain language (Pete's preference, 2026-10-14). After long-running or delegated work, give a self-contained final overview without waiting for Pete to ask what was implemented.
+
+- Lead with what is now available and whether it is live, ready for review, source-only, partially delivered or blocked. Use only the status supported by evidence.
+- Describe what Pete or a user can now do and see. Use a short list when several behaviors are easier to scan; explain reusable platform functionality separately when relevant.
+- Summarize meaningful verification in everyday terms: what real actions were tried and what was preserved. Distinguish live checks from local or simulated tests.
+- State known issues, remaining limitations and their practical impact plainly. Do not turn an untested case into a success claim; say “no known blocker in the tested experience” only when supported.
+- End with review ownership or the concrete next step, plus an accessible Flight Deck task/document or hosted app link when useful.
+
+Keep commit hashes, UUIDs, worker/dispatch identifiers, assertion counts, internal filenames and detailed technical chronology in task comments, evidence documents or ignored handoffs unless Pete needs them to act. Technical milestone reports from workers are inputs to the manager's overview, not a substitute for it. Do not present source completion as live completion. Scale the length to the work; a concise, connected explanation is better than a raw status dump. For blocked work, explain what already works, what prevents completion and the next action.
 
 ## Working A Task
 

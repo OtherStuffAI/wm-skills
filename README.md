@@ -7,7 +7,7 @@ Sanitized, portable skills for working on Wingman Be Free.
 - `wingman-be-free-platform`: compact architecture and routing entrypoint
 - `forgejo-tower`: Tower-backed Forgejo setup, organizations, repositories, users, sharing, issues, Actions, and CI
 - `flight-deck-workflow`: Flight Deck and supervised work
-- `wingman-sessions`: active-session prompt acknowledgement and dispatch callback inbox handling
+- `wingman-sessions`: active-session prompt incorporation, two-way communication, and dispatch callback inbox handling
 - `context-exploration`: scope component trees, selected authoritative sources, and authorized structure management
 - `wingmen-pipelines`: Autopilot declarative pipelines
 - `wapps`: WApp integration and operation
@@ -33,7 +33,7 @@ python3 scripts/sync-skills.py sync \
   --claude-dir "$HOME/.claude/skills"
 ```
 
-It replaces only this repository's named skill directories. Restart the client or begin a new session after syncing so skills are rediscovered.
+It replaces only this repository's named skill directories. Installed files do not prove rediscovery in an already-running client. Use its supported skill discovery on the next normal session; do not restart a client/harness solely for rediscovery.
 
 For the first-setup skill alone, the `packages/setup` npm package installs it without cloning this repository. Once published to npm, run `npx @wingmanbefree/setup` (or add `--target claude`). The package bundles the canonical `wingman-first-setup` directory at pack time. Before publication, you can use this Git checkout directly:
 
