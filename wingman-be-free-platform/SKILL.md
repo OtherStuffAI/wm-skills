@@ -45,7 +45,8 @@ Read [references/component-map.md](references/component-map.md) when choosing a 
 - For declarative pipelines, use `wingmen-pipelines`.
 - For WApp runtime/API work, use `wapps`.
 - For live branch deployment, use `wingman-deploy`.
-- For visual review surfaces, use `artifacts`.
+- For Ambulando/Tower canvases, naplets, private HTML/Excalidraw Files and canvas-linked source records, use `ambulando-canvas`.
+- For Artifact WApp visual review surfaces, use `artifacts`.
 
 ## Shared invariants
 

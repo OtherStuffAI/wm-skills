@@ -7,6 +7,8 @@ description: Use when building, reading, reviewing, or sharing rendered HTML, vi
 
 Use the Artifact WApp when the user or a task needs a rendered proposal, interactive review surface, whiteboard, or visual artifact that should be shared and revisited.
 
+For explicit Ambulando/Tower Canvas or naplet links/output, use `ambulando-canvas`: its HTML and Excalidraw are private Tower Files, and its tasks/docs/chats remain real source records. Do not route those requests to the legacy Artifact WApp. The Artifact WApp workflow below still applies to its own links and requested outputs.
+
 ## Recognize and read
 
 Treat any Artifact WApp link, whiteboard reference, Excalidraw/tldraw link, or URL containing `/artifacts/<project>/<artifact>/<version>/` as a visual source surface. Read it before asking the user to restate what is shown.

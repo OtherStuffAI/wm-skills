@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 *.tgz
 packages/setup/skill/
+
+/tmp/docs/handoffs/

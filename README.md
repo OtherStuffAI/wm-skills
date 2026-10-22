@@ -13,6 +13,7 @@ Sanitized, portable skills for working on Wingman Be Free.
 - `wapps`: WApp integration and operation
 - `wingman-deploy`: deployed-branch release workflow
 - `artifacts`: Artifact WApp and visual review surfaces
+- `ambulando-canvas`: Tower-backed canvas reading, real task creation, source records, private HTML and Excalidraw publishing
 - `wingman-first-setup`: first Tower workspace, Autopilot, sovereign bot, transport, and Flight Deck connection
 
 The platform skill is intentionally short. Conditional operating detail belongs in its references or the specialist skill that owns the workflow.

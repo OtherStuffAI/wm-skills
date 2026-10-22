@@ -150,6 +150,8 @@ Do not paste a long file dump into chat. Put the substance in a document or atta
 
 ## Artifacts and whiteboards
 
+For explicit Ambulando/Tower Canvas or naplet links/output, use `ambulando-canvas`: its HTML and Excalidraw are private Tower Files, and its tasks/docs/chats remain real source records. Do not route those requests to the legacy Artifact WApp. The Artifact WApp workflow below still applies to its own links and requested outputs.
+
 If a message contains an Artifact WApp URL, a whiteboard reference, or an Excalidraw/tldraw link, treat the linked artifact as the authoritative visual workspace for that request. Open/read it before replying. If the request is to build or change it, use the Artifact WApp workflow and create a new feedback version unless the user asks to overwrite. If the request is to review it, inspect the saved scene and compare versions where available; for Excalidraw, review text, element geometry, arrows, embedded images, and visual layout, not just link metadata.
 
 ## Replying To The User
