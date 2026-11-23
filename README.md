@@ -8,12 +8,14 @@ Sanitized, portable skills for working on Wingman Be Free.
 - `forgejo-tower`: Tower-backed Forgejo setup, organizations, repositories, users, sharing, issues, Actions, and CI
 - `flight-deck-workflow`: Flight Deck and supervised work
 - `wingman-sessions`: active-session prompt incorporation, two-way communication, and dispatch callback inbox handling
+- `wingman-matt-adapter`: channel task/Doc/Artefact routing for Matt Pocock's skills; the [pinned 27-skill integration](integrations/matt-pocock/README.md) has its own conflict-detecting installer
 - `context-exploration`: scope component trees, selected authoritative sources, and authorized structure management
 - `wingmen-pipelines`: Autopilot declarative pipelines
 - `wapps`: WApp integration and operation
 - `wingman-deploy`: deployed-branch release workflow
 - `artifacts`: Artifact WApp and visual review surfaces
 - `ambulando-canvas`: Tower-backed canvas reading, real task creation, source records, private HTML and Excalidraw publishing
+- `ambulando-artefacts`: channel-owned Docs, editable whiteboards, private HTML and typed System Flows without requiring a canvas
 - `wingman-first-setup`: first Tower workspace, Autopilot, sovereign bot, transport, and Flight Deck connection
 
 The platform skill is intentionally short. Conditional operating detail belongs in its references or the specialist skill that owns the workflow.

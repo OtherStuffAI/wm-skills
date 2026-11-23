@@ -1,0 +1,45 @@
+# Supported operations and verification
+
+Discover the live connection and current repositories before using these contracts. Names such as `flightdeck-pg`, `towerClient` and historical source paths remain exact API identifiers; call the shared state service NStack in new prose. No secrets, fixed owner identities, workspace IDs or private records belong in this portable skill.
+
+## Tasks and dependencies
+
+Use the current Autopilot `clis/wingman.ts flightdeck` context/task show/comments/state operations. Where that CLI lacks creation/patching, inspect the current NStack typed routes and an existing broker-signed helper. Current task routes are under `/api/v4/flightdeck-pg/workspaces/:workspaceId`:
+
+- `GET /channels/:channelId/tasks` supports cursor discovery; read every page.
+- `POST /channels/:channelId/tasks` creates a task. `client_request_id` binds an exact creation request to a stable identity; reuse the same request/content after uncertainty and read back before retrying. Different content with the same key is a conflict.
+- `GET /tasks/:taskId` and `/comments` recover current body, assignment, relationships and discussion.
+- `PATCH /tasks/:taskId` accepts supported fields and `row_version`. Native relationships are `metadata.parent_task_id` and `metadata.predecessor_task_ids`; preserve other metadata. Relationship/assignment changes require the captured row version. `GET /tasks/:taskId/relationships` exposes ACL-filtered relationships. Inspect the active route before assuming every description-only patch enforces CAS: where it does not, coordinate a single writer and reread immediately before/after the patch; disclose the residual race.
+- State changes use `/tasks/:taskId/state` with the actual edit lease and row version; use the existing broker-aware helper.
+
+Create approved tickets first, then wire real IDs. Validate target reads, self-links and cycles. Build the frontier from visible predecessor states, treating hidden/incomplete dependencies as unknown, never ready. Parent/child and blocker links are different relationships. Claim through the supported assignee field with a version check and readback; do not represent a body label as an atomic claim. Do not close an implementation parent merely because children were published. Manager review, rather than source completion alone, determines readiness for review/closure.
+
+Matt's `wayfinder:*` and triage roles are semantic labels, not NStack state enum values. Preserve them in a clearly named body section or verified metadata configuration and query all pages; do not invent a label API. Keep decision tickets distinct from implementation tickets. State/label mappings must retain needs-info, rejected, human-only and agent-ready distinctions, with a recorded reason. Read task graph/assignment and fresh comments at every resumption.
+
+## Docs and concurrent revisions
+
+Use broker-aware `flightdeck_doc_create`, `flightdeck_doc_get`, `flightdeck_doc_comments`, `flightdeck_doc_update` and actual comment-reply tools, or the equivalent typed CLI. Verify their context targets the intended channel first. Current typed Doc creation uploads canonical private storage bytes and attaches `storage_object_id`; an arbitrary inline `body` is not the raw POST contract. Prefer the existing helper's canonical serialization.
+
+Before editing, read canonical body and retain `row_version`, `base_version_id` and `base_body_sha256_hex` from that read. Pass them as `captured_base` to the update helper. The helper negotiates `document_concurrent_edit_v1` where advertised and acquires an editor-session lease; it must not downgrade after refusal. The typed PATCH binds private storage, base version/hash and lease. Keep private assets/embedded references unchanged unless the requested change requires editing them. Read `/docs/:docId/versions` to verify new immutable revisions; comments stay on the Doc, including `parent_comment_id` replies. A repeat save uses the same Doc identity, not a second creation. Identical body can be a no-op after verified readback; do not assume server deduplication.
+
+A stale Doc save can return `document_recovery_created` with `canonical_advanced:false`: the submitted body becomes a non-head recovery, while current canonical work stays intact. A helper may wrap that response in a generic failure message; inspect its structured code/head/recovery before classifying it as network failure or retrying. Read the recovery and current body, reconcile the draft, and resolve it through the supported promote/discard contract only with authority for that decision. Discard retains its source/storage history; it is not a way to erase another author's work.
+
+Doc creation does not promise a server-unique provenance constraint. Use one writer, complete discovery and persisted accepted IDs; after response loss reconcile channel docs/source metadata/body before a retry. Preserve comments/assets/current edits when rerunning research, specs or domain modeling.
+
+## Whiteboards, HTML and typed flows
+
+Read installed `ambulando-artefacts`, its publishing/migration references, and the authorized Ambulando source docs/helpers. Common current source is `~/code/ambulando/sol`; never infer deployment from that checkout. `scripts/artefact.mjs list` fetches Docs/Files with limit 200; full/truncated results require complete discovery. Its `types` list is not an exhaustive proof of System Flow support: inspect `src/artefact-registry.js` and the actual flow helper/editor.
+
+- Whiteboards: `scripts/excalidraw-board.mjs` create/read/check/publish. Preserve element IDs, version/nonces, tombstones, geometry, bindings, embedded raster files and spatial discussions. Updates use the captured `--base`. Read and validate exact saved bytes/assets after publication; canvas is optional.
+- HTML: `scripts/publish-html-artifact.mjs` packages a local folder and supports dry-run/smoke. Revise using `--file` and captured `--base`. Preserve manifest-bound private assets and source sidecars. The credentialless/network-restricted sandbox is part of the product contract, so use packaged code/assets rather than remote CDNs. Do not widen it to make a report work.
+- System Flow: `src/system-flow-schema.js` and `src/system-flow.js` govern current bounded web editing. MIME `application/vnd.ambulando.system-flow+json`, type `system-flow`, editor `builtin.system-flow`, format version 1. Validate legacy schemaVersion 1–3; schema 3 requires the complete hydrated scenes map. Preserve node/edge IDs, typed data, owners, decisions, diagram/container relationships, detail flows, whiteboards, image bytes and exception/retry edges. New File writes/revisions use current private storage and File CAS contracts, not an invented flow route. Inspect working UI save code or supported helper before authoring a new flow. The selected-version migration helper is not a generic new-flow publisher.
+
+For an explicit legacy source read `artifacts` first. Read `artifact-wapp/src/flow-schema.js`, `src/flow-editor/`, `docs/flow-editor.md` and `docs/linked-whiteboards.md` before handling nested/linked scenes. Resolve latest meaningful published lineage through the running catalogue, distinguishing retired versions and drafts. Migration needs specific authorization and effective audience comparison, not a successful read or acknowledgement flag. Preserve source URL/version provenance and original history; reconcile existing destination mappings before import. No bulk migration, old-app output or retirement is implied.
+
+The bounded current web flow overview simplifies legacy rendering and cannot edit linked whiteboard scenes; native flow editing is unsupported until verified otherwise. Report these limits. An offline schema pass does not establish live File saving, edit/save/reopen, image access, mobile behavior or native parity.
+
+## Dependencies, discovery and rollout
+
+The complete bundle installer requires `flight-deck-workflow`, `ambulando-artefacts`, `wingman-sessions` and `artifacts`, because the collection includes supervised handoffs and legacy architecture sources. Load the latter two only when that branch applies; `ambulando-canvas` is optional and used only for layout. Resolve them beside this skill or through the harness skill catalogue. Installation must validate these dependencies before declaring this integration usable.
+
+Use the source repository's pinned `scripts/matt-overlay.py` tool for Matt updates; its maintenance guide is `integrations/matt-pocock/README.md` in `wm-skills`. Preserve frontmatter and `agents/openai.yaml` invocation settings. Local disk installation is not fresh-session discovery. Autopilot has an owner-scoped `/skills` catalogue with immutable imports and exact-revision plan/apply deployment to known projects; those operations are separate from fetch/import/activation. Inspect current supported management and authorization before remote changes. Deploy only specifically authorized targets, preserve unmanaged conflicts, and verify their actual discovery/revision. Never infer remote installation from shared local paths or restart a harness for this task.
