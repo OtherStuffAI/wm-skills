@@ -5,6 +5,12 @@ description: Route Matt Pocock skill work in Wingman to the verified channel's t
 
 # Wingman persistence adapter
 
+## Native Flight Deck handoff
+
+In Flight Deck chats, task comments and document discussions, return channel-owned artefacts as `@[Artefact title](mention:file:<file-uuid>)`; ordinary Docs use `@[Document title](mention:doc:<doc-uuid>)`. Use the saved NStack File/Doc record ID, never a storage-object ID, version ID or local path. These references open in the current app and retain its workspace context. Verify the record belongs to the intended workspace/channel and report its saved revision and access mode.
+
+A hosted Ambulando URL (including `artefactid`/`workspaceid` query URLs) is not the handoff format: it navigates away from the current client and can disrupt the app. Keep service URLs for API operations, provenance and explicitly requested external-browser sharing. Preserve legacy source URLs when reading or when the user explicitly requests legacy WApp output. A native reference grants no additional access; report a missing reference/navigation capability rather than substituting a hosted link.
+
 Apply this contract when the request names Wingman/NStack/Flight Deck/Ambulando records, arrives through a Wingman channel/task dispatch, or the repository explicitly configures Wingman persistence. A Git remote or installed skill alone is not activation. Outside that context, retain Matt's standalone workflow.
 
 Inside Wingman, this contract **supersedes conflicting upstream saving and tracker defaults**, including defaults in supporting templates: GitHub/GitLab issues, `.scratch` tickets, repo/OS-temp research, glossary/ADR/questionnaire paths, handoff directories, report opening and throwaway research branches. Preserve the underlying interviews, decision frontier, tracer bullets, primary-source research, tests, review methods and invocation policies. Existing user choices and repository instructions still govern code, branches, commits, approvals and delegation.

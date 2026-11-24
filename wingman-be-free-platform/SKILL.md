@@ -5,6 +5,12 @@ description: Orient and implement work across Wingman Autopilot, Tower, Flight D
 
 # Wingman Be Free Platform
 
+## Native Flight Deck handoff
+
+In Flight Deck chats, task comments and document discussions, return channel-owned artefacts as `@[Artefact title](mention:file:<file-uuid>)`; ordinary Docs use `@[Document title](mention:doc:<doc-uuid>)`. Use the saved NStack File/Doc record ID, never a storage-object ID, version ID or local path. These references open in the current app and retain its workspace context. Verify the record belongs to the intended workspace/channel and report its saved revision and access mode.
+
+A hosted Ambulando URL (including `artefactid`/`workspaceid` query URLs) is not the handoff format: it navigates away from the current client and can disrupt the app. Keep service URLs for API operations, provenance and explicitly requested external-browser sharing. Preserve legacy source URLs when reading or when the user explicitly requests legacy WApp output. A native reference grants no additional access; report a missing reference/navigation capability rather than substituting a hosted link.
+
 Use this skill to decide where work belongs before editing. Read live code and the nearest repository instructions when they differ from this overview.
 
 ## Product boundaries

@@ -5,6 +5,12 @@ description: Create, read, revise and review channel-owned Ambulando Docs/Artefa
 
 # Channel-owned Ambulando artefacts
 
+## Native Flight Deck handoff
+
+In Flight Deck chats, task comments and document discussions, return channel-owned artefacts as `@[Artefact title](mention:file:<file-uuid>)`; ordinary Docs use `@[Document title](mention:doc:<doc-uuid>)`. Use the saved NStack File/Doc record ID, never a storage-object ID, version ID or local path. These references open in the current app and retain its workspace context. Verify the record belongs to the intended workspace/channel and report its saved revision and access mode.
+
+A hosted Ambulando URL (including `artefactid`/`workspaceid` query URLs) is not the handoff format: it navigates away from the current client and can disrupt the app. Keep service URLs for API operations, provenance and explicitly requested external-browser sharing. Preserve legacy source URLs when reading or when the user explicitly requests legacy WApp output. A native reference grants no additional access; report a missing reference/navigation capability rather than substituting a hosted link.
+
 New artefacts belong in the correct channel's Docs/Artefacts. NStack owns Docs/Files, immutable revisions, private assets and ACLs. Canvases remain optional references to those same records; no separate catalogue/database or copied application per artefact.
 
 ## Resolve and read
@@ -41,4 +47,4 @@ Use `artifacts` to read explicit old WApp URLs and saved scenes/assets. Keep ori
 
 ## Verify and hand back
 
-Read back the saved record/revision and private assets. Exercise rendering, important controls, edit/save/reopen and destination access where available; distinguish local/synthetic checks from real workspace and native-client checks. Return the direct record link copied by Ambulando and the channel, saved revision, access mode and verification limits. Current rich-File web links use `artefactid` and `workspaceid` on the configured Ambulando page (see `copyArtefactLink` in `src/artefacts.js`); preserve the app's actual route instead of inventing a universal URL. Document links use the existing Docs copy-link contract. Links grant no access. For a requested canvas, reference the same source with `ambulando-canvas` rather than republishing it.
+Read back the saved record/revision and private assets. Exercise rendering, important controls, edit/save/reopen and destination access where available; distinguish local/synthetic checks from real workspace and native-client checks. Return the native Flight Deck File/Doc reference described above, channel, saved revision, access mode and verification limits. References grant no access. For a requested canvas, reference the same source with `ambulando-canvas` rather than republishing it.

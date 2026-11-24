@@ -5,6 +5,12 @@ description: Use when building, reading, reviewing, or sharing rendered HTML, vi
 
 # Artifacts
 
+## Native Flight Deck handoff
+
+In Flight Deck chats, task comments and document discussions, return channel-owned artefacts as `@[Artefact title](mention:file:<file-uuid>)`; ordinary Docs use `@[Document title](mention:doc:<doc-uuid>)`. Use the saved NStack File/Doc record ID, never a storage-object ID, version ID or local path. These references open in the current app and retain its workspace context. Verify the record belongs to the intended workspace/channel and report its saved revision and access mode.
+
+A hosted Ambulando URL (including `artefactid`/`workspaceid` query URLs) is not the handoff format: it navigates away from the current client and can disrupt the app. Keep service URLs for API operations, provenance and explicitly requested external-browser sharing. Preserve legacy source URLs when reading or when the user explicitly requests legacy WApp output. A native reference grants no additional access; report a missing reference/navigation capability rather than substituting a hosted link.
+
 Use the Artifact WApp when the user or a task needs a rendered proposal, interactive review surface, whiteboard, or visual artifact that should be shared and revisited.
 
 For explicit Ambulando/Tower Canvas or naplet links/output, use `ambulando-canvas`: its HTML and Excalidraw are private Tower Files, and its tasks/docs/chats remain real source records. Do not route those requests to the legacy Artifact WApp. The Artifact WApp workflow below still applies to its own links and requested outputs.

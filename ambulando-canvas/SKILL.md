@@ -5,6 +5,12 @@ description: Read, build, and update Ambulando/Tower canvases with real tasks, d
 
 # Ambulando Canvas
 
+## Native Flight Deck handoff
+
+In Flight Deck chats, task comments and document discussions, return channel-owned artefacts as `@[Artefact title](mention:file:<file-uuid>)`; ordinary Docs use `@[Document title](mention:doc:<doc-uuid>)`. Use the saved NStack File/Doc record ID, never a storage-object ID, version ID or local path. These references open in the current app and retain its workspace context. Verify the record belongs to the intended workspace/channel and report its saved revision and access mode.
+
+A hosted Ambulando URL (including `artefactid`/`workspaceid` query URLs) is not the handoff format: it navigates away from the current client and can disrupt the app. Keep service URLs for API operations, provenance and explicitly requested external-browser sharing. Preserve legacy source URLs when reading or when the user explicitly requests legacy WApp output. A native reference grants no additional access; report a missing reference/navigation capability rather than substituting a hosted link.
+
 A canvas arranges references to real Tower records, plus native drawings and annotations. Read the authorized snapshot and the underlying records before interpreting or changing it. A task-shaped drawing never creates a task.
 
 1. Discover the active Ambulando and Tower checkouts, deployment origins, workspace and broker signer using [connection and reading](references/reading.md). Read current repository instructions and relevant source docs; older checkouts can lack newer contracts.

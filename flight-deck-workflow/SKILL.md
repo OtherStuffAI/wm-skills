@@ -5,6 +5,12 @@ description: "Operate Wingman Flight Deck safely through Tower's typed PG record
 
 # Flight Deck Workflow
 
+## Native Flight Deck handoff
+
+In Flight Deck chats, task comments and document discussions, return channel-owned artefacts as `@[Artefact title](mention:file:<file-uuid>)`; ordinary Docs use `@[Document title](mention:doc:<doc-uuid>)`. Use the saved NStack File/Doc record ID, never a storage-object ID, version ID or local path. These references open in the current app and retain its workspace context. Verify the record belongs to the intended workspace/channel and report its saved revision and access mode.
+
+A hosted Ambulando URL (including `artefactid`/`workspaceid` query URLs) is not the handoff format: it navigates away from the current client and can disrupt the app. Keep service URLs for API operations, provenance and explicitly requested external-browser sharing. Preserve legacy source URLs when reading or when the user explicitly requests legacy WApp output. A native reference grants no additional access; report a missing reference/navigation capability rather than substituting a hosted link.
+
 ## Same-thread progress updates
 
 For substantial work requested in Flight Deck chat, post a brief acknowledgement into the originating workspace/channel/thread before continuing. Use the broker-aware Flight Deck chat tool or supported CLI; runtime activity, session commentary, task comments and worker logs do not substitute for a persisted chat message. Confirm the write succeeded; if it fails, report the delivery failure plainly.
@@ -275,7 +281,8 @@ Mention forms:
 @[Task Title](mention:task:<task-id>)
 @[Channel Name](mention:channel:<channel-id>)
 @[Message](mention:message:<message-id>)
-@[Document Title](mention:document:<doc-id>)
+@[Document Title](mention:doc:<doc-id>)
+@[Artefact Title](mention:file:<file-id>)
 @[Person Name](mention:person:<npub>)
 @[Agent Name](mention:agent:<npub>)
 ```
