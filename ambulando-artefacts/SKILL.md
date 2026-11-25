@@ -35,6 +35,10 @@ Use [private HTML and whiteboard publishing](references/publishing.md) for actua
 
 NStack ACLs govern each Doc/File/revision/image independently. Default private; never widen access to solve a denied read. Preserve partial successes after uncertain multi-step writes; inspect accepted source IDs/heads before retrying. Re-read and reconcile stale source in a separate local file; never replace only a base token to force an overwrite.
 
+## Backend extension boundary
+
+Before changing NStack for an artefact feature, read `wingman-be-free-platform` and its pluggable application boundary. Reuse existing Docs/Files, storage, revisions and ACL contracts; keep formats, editors, templates and application rules in Ambulando. Report a missing reusable primitive with evidence before proposing a backend endpoint. Current typed routes remain supported; this direction does not authorize a data migration or prove generic API parity.
+
 ## Controlled formats and templates
 
 Inspect `src/artefact-registry.js`, `src/artefact-templates.js` and working editor/helper contracts before selecting template/style IDs. Current source includes controlled Docs, Excalidraw, HTML and System Flow starters plus a selected-version importer; read [templates, System Flow and migration](references/migration.md) for verified source mechanics and limits. This does not establish deployed or native support, or a presentation editor. Templates/editors/styles remain Ambulando-controlled initially; future plugins require an approved extension contract, not open installation.

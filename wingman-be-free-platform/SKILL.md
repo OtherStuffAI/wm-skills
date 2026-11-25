@@ -15,14 +15,14 @@ Use this skill to decide where work belongs before editing. Read live code and t
 
 ## Product boundaries
 
-- **Tower** is the shared authority: NIP-98 identity, workspaces, groups, typed Flight Deck PG APIs, storage, allowlisted Nostr OIDC authentication, and graph access.
+- **NStack** (historically Tower) is the reusable shared authority: NIP-98 identity, workspaces, groups, typed Flight Deck PG APIs, storage, allowlisted Nostr OIDC authentication, and graph access.
 - **Flight Deck** is the human coordination UI: chat, tasks, docs, approvals, scopes, people, and WApp launchers.
 - **Autopilot** runs work: sessions, Agent Direct, supervised dispatch, pipelines, triggers, apps, and WApps.
 - **Forgejo** owns native accounts, organizations, teams, collaborators, repositories, permissions, OAuth credentials, Git, APIs and reviews. Tower authenticates allowlisted Nostr identities only; no Tower Git grants or reconciliation apply.
 - **WApps** own business-specific UI and app data while using Tower and Autopilot through supported APIs.
-- **Graph memory** is a Tower-controlled optional capability, not a raw database for agents.
+- **Graph memory** is a NStack-controlled optional capability, not a raw database for agents.
 
-Do not move app-specific behavior into Tower, redefine Tower contracts in Autopilot, or make Flightlog mandatory for normal workspace work.
+Before adding an endpoint, app table, migration or shared contract, read [the pluggable application boundary](references/pluggable-app-boundary.md). Keep app domain behavior in its application namespace; extend NStack only for a demonstrated reusable capability gap. Existing typed Flight Deck contracts remain supported until a separately validated migration.
 
 ## Locate the active checkout
 
