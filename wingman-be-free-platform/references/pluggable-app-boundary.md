@@ -10,7 +10,7 @@ Existing typed Flight Deck routes and data remain supported while app-owned equi
 
 ## Feature decision
 
-Before proposing a route, table, migration or shared contract change:
+Before proposing a route, table, migration, server type enum, sync family or shared contract change:
 
 1. State the app-owned data and behavior, and identify the supported generic contracts that could express it. Read the authoritative code/OpenAPI and relevant contract docs; verify the selected target's availability.
 2. Check the complete behavior: registration and schema evolution, identity/delegation, per-user/group access, bounded queries, atomicity and conflict handling, storage/revisions, realtime and recovery. Record what is implemented, missing or unverified.

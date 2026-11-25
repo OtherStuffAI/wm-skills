@@ -58,7 +58,7 @@ Read [references/component-map.md](references/component-map.md) when choosing a 
 
 - Stable actor, workspace, group, and repository UUIDs are authority keys. Readable aliases are mutable presentation.
 - `group_npub` is rotating crypto identity, not a durable ACL key.
-- Prefer typed Tower PG APIs for new shared workspace behavior. Encrypted generic record sync is compatibility unless live code proves otherwise.
+- Use existing typed NStack PG APIs for supported workspace behavior. New app features follow the pluggable application boundary; typed routes are not a reason to add app-specific server behavior. Encrypted record sync remains compatibility unless live code proves otherwise.
 - Agent sessions use brokered capabilities. Never search for, expose, or persist human, bot, service, or provider secrets.
 - Preserve workspace boundaries and explicit delegation. An agent signer does not silently become the human owner.
 - Prefer WApps for customer-specific interfaces and local app databases.
