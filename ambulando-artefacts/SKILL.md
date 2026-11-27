@@ -29,6 +29,8 @@ The list helper fetches Docs and Files with `limit=200`; check completeness/pagi
 
 ## Create or revise
 
+When creating output from a goal-associated chat, follow [goal context and output associations](../flight-deck-workflow/references/goal-discussions.md). Keep the new original Doc/File associated with the chat's primary goal through native metadata, independently of pins and explicit goal mentions.
+
 Choose destination from the request and authoritative context. Verify scope/channel membership; a nearby canvas item, link or pin grants no authority. Search for the existing record (including migration provenance) and revise that identity rather than creating disconnected feedback copies. Documents retain Docs identity, comments and current checkout/lease/body-version rules; discover that contract in current code before writing.
 
 Use [private HTML and whiteboard publishing](references/publishing.md) for actual helpers, editable assets, immutable versions, sandbox limits and CAS reconciliation. HTML updates require `--file '<existing-id>' --base '<version-read-before-authoring>'`. Whiteboards preserve element IDs, changed versions/nonces, tombstones, image bindings and embedded bytes. Create without `--canvas` unless canvas placement is requested. Durable interactive data must use real supported shared records; browser state is not a database.

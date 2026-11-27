@@ -1,6 +1,6 @@
 ---
 name: flight-deck-workflow
-description: "Operate Wingman Flight Deck safely through Tower's typed PG records and Autopilot. Use for Agent Direct chat, task-backed implementation, supervised worker dispatch, task comments, documents, approvals, files, same-thread reporting, and task-state handoff."
+description: "Operate Wingman Flight Deck safely through Tower's typed PG records and Autopilot. Use for Agent Direct chat, goal context, task-backed implementation, supervised worker dispatch, task comments, documents, approvals, files, same-thread reporting, and task-state handoff."
 ---
 
 # Flight Deck Workflow
@@ -85,6 +85,10 @@ Read [references/agent-direct-and-supervision.md](references/agent-direct-and-su
 ## Work arriving during an active turn
 
 Read the `wingman-sessions` skill when managing a working session's queue or supervised callback inbox. Inspect pending work at useful milestones and before final handoff. Read the authoritative referenced thread/task before acting, then immediately consume only the exact queue revision incorporated into context/plan. Consumption is not completion: retain outstanding actions on the task/plan. Dispatch callbacks use their own inbox and acknowledge/close operations. Keep unincorporated or unrelated work pending; do not clear the queue to suppress future turns.
+
+## Goal discussions
+
+For a goal-associated chat or an explicit Goal File mention, read [goal context and output associations](references/goal-discussions.md). Resolve the authoritative goal and accessible pinned references, preserve the chat's primary association, and keep goal metadata in structured context.
 
 ## Handle Agent Direct
 
